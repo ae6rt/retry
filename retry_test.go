@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func TestHappyPathNoTimeout(t *testing.T) {
+func TestOKNoTimeout(t *testing.T) {
 	r := New(0*time.Second, 3)
 	err := r.Try(func() error {
 		return nil
@@ -16,7 +16,7 @@ func TestHappyPathNoTimeout(t *testing.T) {
 	}
 }
 
-func TestHappyPathWithTimeout(t *testing.T) {
+func TestOKWithTimeout(t *testing.T) {
 	r := New(3*time.Second, 3)
 	err := r.Try(func() error {
 		return nil
