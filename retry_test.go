@@ -6,8 +6,18 @@ import (
 	"time"
 )
 
-func TestHappyPath(t *testing.T) {
+func TestHappyPathNoTimeout(t *testing.T) {
 	r := New(0*time.Second, 3)
+	err := r.Try(func() error {
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("Unexpected error: %v\n", err)
+	}
+}
+
+func TestHappyPathWithTimeout(t *testing.T) {
+	r := New(3*time.Second, 3)
 	err := r.Try(func() error {
 		return nil
 	})
@@ -32,9 +42,9 @@ func TestRetryExceeded(t *testing.T) {
 }
 
 func TestTimeout(t *testing.T) {
-	r := New(2*time.Second, 1)
+	r := New(500*time.Millisecond, 1)
 	err := r.Try(func() error {
-		time.Sleep(4 * time.Second)
+		time.Sleep(1000 * time.Millisecond)
 		return nil
 	})
 	if err == nil {
@@ -50,6 +60,6 @@ func TestIsTimeout(t *testing.T) {
 		t.Fatalf("Expected timeout error\n")
 	}
 	if isTimeout(errors.New("")) {
-		t.Fatalf("Unexpected error\n")
+		t.Fatalf("Not a timeout error\n")
 	}
 }
