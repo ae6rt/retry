@@ -55,7 +55,7 @@ func (r Retry) Try(work func() error) error {
 	}
 }
 
-func isTimeout(err error) bool {
+func IsTimeout(err error) bool {
 	if _, ok := err.(timeoutError); ok {
 		return true
 	}

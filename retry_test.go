@@ -1,13 +1,14 @@
-package retry
+package retry_test
 
 import (
 	"errors"
+	"github.com/ae6rt/retry"
 	"testing"
 	"time"
 )
 
 func TestOKNoTimeout(t *testing.T) {
-	r := New(0*time.Second, 3)
+	r := retry.New(0*time.Second, 3)
 	err := r.Try(func() error {
 		return nil
 	})
@@ -17,7 +18,7 @@ func TestOKNoTimeout(t *testing.T) {
 }
 
 func TestOKWithTimeout(t *testing.T) {
-	r := New(3*time.Second, 3)
+	r := retry.New(3*time.Second, 3)
 	err := r.Try(func() error {
 		return nil
 	})
@@ -27,7 +28,7 @@ func TestOKWithTimeout(t *testing.T) {
 }
 
 func TestRetryExceeded(t *testing.T) {
-	r := New(0*time.Second, 3)
+	r := retry.New(0*time.Second, 3)
 	tries := 0
 	err := r.Try(func() error {
 		tries += 1
@@ -42,7 +43,7 @@ func TestRetryExceeded(t *testing.T) {
 }
 
 func TestTimeout(t *testing.T) {
-	r := New(500*time.Millisecond, 1)
+	r := retry.New(500*time.Millisecond, 1)
 	err := r.Try(func() error {
 		time.Sleep(1000 * time.Millisecond)
 		return nil
@@ -50,16 +51,7 @@ func TestTimeout(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected error\n")
 	}
-	if _, ok := err.(timeoutError); !ok {
+	if !retry.IsTimeout(err) {
 		t.Fatalf("Expected retry.timeoutError\n")
-	}
-}
-
-func TestIsTimeout(t *testing.T) {
-	if !isTimeout(timeoutError{}) {
-		t.Fatalf("Expected timeout error\n")
-	}
-	if isTimeout(errors.New("")) {
-		t.Fatalf("Not a timeout error\n")
 	}
 }
