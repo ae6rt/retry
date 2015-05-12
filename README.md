@@ -3,8 +3,13 @@ Go retry package with timeout and retry limits.
 Usage
 
 ```
-retry := New(3*time.Second, 3)
+...
+
+import "github.com/ae6rt/retry"
+
+retry := retry.New(3*time.Second, 3)
 work := func() error {
+   // do stuff
    return nil
 }
 
