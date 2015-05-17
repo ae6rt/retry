@@ -7,7 +7,7 @@ Usage
 
 import "github.com/ae6rt/retry"
 
-retry := retry.New(3*time.Second, 3)
+retry := retry.New(3*time.Second, 3, retry.DefaultBackoffFunc)
 work := func() error {
    // do stuff
    return nil

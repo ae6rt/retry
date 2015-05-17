@@ -4,10 +4,6 @@ import (
 	"time"
 )
 
-type timeoutError struct {
-	error
-}
-
 var DefaultBackoffFunc = func(attempts uint) {
 	if attempts == 0 {
 		return
@@ -20,6 +16,14 @@ func New(timeout time.Duration, maxAttempts uint, backoffFunc func(uint)) Retry 
 		maxAttempts = 1
 	}
 	return Retry{timeout: timeout, maxAttempts: maxAttempts, backoffFunc: backoffFunc}
+}
+
+type timeoutError struct {
+	error
+}
+
+func (t timeoutError) String() string {
+	return "retry.timeout"
 }
 
 type Retry struct {
@@ -69,8 +73,4 @@ func IsTimeout(err error) bool {
 		return true
 	}
 	return false
-}
-
-func (t timeoutError) String() string {
-	return "retry.timeout"
 }
