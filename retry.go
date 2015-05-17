@@ -8,22 +8,30 @@ type timeoutError struct {
 	error
 }
 
-type Retry struct {
-	timeout     time.Duration
-	maxAttempts int
+var DefaultBackoffFunc = func(attempts uint) {
+	if attempts == 0 {
+		return
+	}
+	time.Sleep((1 << attempts) * time.Millisecond)
 }
 
-func New(timeout time.Duration, maxAttempts int) Retry {
+func New(timeout time.Duration, maxAttempts uint, backoffFunc func(uint)) Retry {
 	if maxAttempts < 1 {
 		maxAttempts = 1
 	}
-	return Retry{timeout: timeout, maxAttempts: maxAttempts}
+	return Retry{timeout: timeout, maxAttempts: maxAttempts, backoffFunc: backoffFunc}
+}
+
+type Retry struct {
+	timeout     time.Duration
+	maxAttempts uint
+	backoffFunc func(uint)
 }
 
 func (r Retry) Try(work func() error) error {
 	doneChan := make(chan struct{})
 	errorChan := make(chan error)
-	attempts := 0
+	var attempts uint = 0
 
 	var expired <-chan time.Time
 	if r.timeout > 0 {
@@ -34,6 +42,7 @@ func (r Retry) Try(work func() error) error {
 
 	for {
 		go func() {
+			r.backoffFunc(attempts)
 			attempts += 1
 			if err := work(); err != nil {
 				errorChan <- err

@@ -8,7 +8,7 @@ import (
 )
 
 func TestOKNoTimeout(t *testing.T) {
-	r := retry.New(0*time.Second, 3)
+	r := retry.New(0*time.Second, 3, retry.DefaultBackoffFunc)
 	err := r.Try(func() error {
 		return nil
 	})
@@ -18,7 +18,7 @@ func TestOKNoTimeout(t *testing.T) {
 }
 
 func TestOKWithTimeout(t *testing.T) {
-	r := retry.New(3*time.Second, 3)
+	r := retry.New(3*time.Second, 3, retry.DefaultBackoffFunc)
 	err := r.Try(func() error {
 		return nil
 	})
@@ -28,7 +28,7 @@ func TestOKWithTimeout(t *testing.T) {
 }
 
 func TestRetryExceeded(t *testing.T) {
-	r := retry.New(0*time.Second, 3)
+	r := retry.New(0*time.Second, 3, retry.DefaultBackoffFunc)
 	tries := 0
 	err := r.Try(func() error {
 		tries += 1
@@ -43,7 +43,7 @@ func TestRetryExceeded(t *testing.T) {
 }
 
 func TestTimeout(t *testing.T) {
-	r := retry.New(500*time.Millisecond, 1)
+	r := retry.New(500*time.Millisecond, 1, retry.DefaultBackoffFunc)
 	err := r.Try(func() error {
 		time.Sleep(1000 * time.Millisecond)
 		return nil
