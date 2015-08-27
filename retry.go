@@ -22,7 +22,7 @@ type timeoutError struct {
 	error
 }
 
-func (t timeoutError) String() string {
+func (t timeoutError) Error() string {
 	return "retry.timeout"
 }
 

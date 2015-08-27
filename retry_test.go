@@ -2,9 +2,11 @@ package retry_test
 
 import (
 	"errors"
-	"github.com/ae6rt/retry"
+	"fmt"
 	"testing"
 	"time"
+
+	"github.com/ae6rt/retry"
 )
 
 func TestOKNoTimeout(t *testing.T) {
@@ -51,6 +53,7 @@ func TestTimeout(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected error\n")
 	}
+	fmt.Println(err)
 	if !retry.IsTimeout(err) {
 		t.Fatalf("Expected retry.timeoutError\n")
 	}
