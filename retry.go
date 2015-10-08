@@ -1,8 +1,12 @@
 package retry
 
 import (
+	"log"
+	"os"
 	"time"
 )
+
+var Log *log.Logger = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
 
 var DefaultBackoffFunc = func(attempts uint) {
 	if attempts == 0 {
@@ -15,6 +19,7 @@ func New(timeout time.Duration, maxAttempts uint, backoffFunc func(uint)) Retry 
 	if maxAttempts < 1 {
 		maxAttempts = 1
 	}
+	Log.Printf("Created retry with timeout=%v, max attempts=%d\n", timeout, maxAttempts)
 	return Retry{timeout: timeout, maxAttempts: maxAttempts, backoffFunc: backoffFunc}
 }
 
@@ -49,6 +54,7 @@ func (r Retry) Try(work func() error) error {
 			r.backoffFunc(attempts)
 			attempts += 1
 			if err := work(); err != nil {
+				Log.Println(err)
 				errorChan <- err
 			} else {
 				doneChan <- struct{}{}
@@ -60,9 +66,11 @@ func (r Retry) Try(work func() error) error {
 			return nil
 		case err := <-errorChan:
 			if attempts == r.maxAttempts {
+				Log.Println("retry.Try max attempts reached")
 				return err
 			}
 		case <-expired:
+			Log.Println("Timeout")
 			return timeoutError{}
 		}
 	}
