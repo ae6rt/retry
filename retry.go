@@ -19,7 +19,6 @@ func New(timeout time.Duration, maxAttempts uint, backoffFunc func(uint)) Retry 
 	if maxAttempts < 1 {
 		maxAttempts = 1
 	}
-	Log.Printf("Created retry with timeout=%v, max attempts=%d\n", timeout, maxAttempts)
 	return Retry{timeout: timeout, maxAttempts: maxAttempts, backoffFunc: backoffFunc}
 }
 
