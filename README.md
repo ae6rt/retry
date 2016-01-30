@@ -12,9 +12,9 @@ work := func() error {
    return nil
 }
 
-retry := retry.New(3*time.Second, 3, retry.DefaultBackoffFunc)
+try := retry.New(3*time.Second, 3, retry.DefaultBackoffFunc)
 
-err := retry.Try(work)
+err := try.Try(work)
 
 if err != nil {
    if retry.IsTimeout(err) {
