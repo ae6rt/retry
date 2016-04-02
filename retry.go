@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var Log *log.Logger = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
+var Log *log.Logger = log.New(os.Stderr, "", log.Ldate|log.Ltime|log.Lshortfile)
 
 var DefaultBackoffFunc = func(attempts uint) {
 	if attempts == 0 {
